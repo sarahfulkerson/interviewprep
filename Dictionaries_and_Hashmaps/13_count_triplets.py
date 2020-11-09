@@ -85,27 +85,38 @@ def countTriplets2(arr, r):
 
     return triplets
 
-def countTriplets(arr, r):
+def countTriplets3(arr, r):
+    """
+    This one isn't working either. Finally looked for a hint in the
+    discussions and it looks like sequentiality is important. Test case
+    to try is:
+
+    5 2
+    1 2 1 2 4
+    """
     from collections import Counter
     from math import factorial
-    
+    arr_dict = Counter()
+    n0 = arr[0]
+
     # If the ratio 'r' is 1 then this is a special case of combinations
     if r == 1:
-        n = len(arr)
+        for x in arr:
+            if x == n0: arr_dict[x] += 1
+        n = arr_dict[n0]
         r2 = 3
-        return factorial(n)//(factorial(r2)*factorial(n-r2))
+        return factorial(n)//(factorial(r2)*factorial(n-r2)), arr_dict
 
     # Main variables for the rest of the function
-    arr_dict = Counter()
     max_arr = max(arr)
-    ratio_range = []
+    ratio_range = [n0]
     triplets = 0
 
     # Build all possible values
-    index = 0
+    index = n0  
     counter = 0
     while index < max_arr:
-        index = r**counter
+        index *= r
         ratio_range.append(index)
         counter += 1
     if ratio_range[-1] > max_arr: ratio_range.pop(-1)
@@ -115,7 +126,7 @@ def countTriplets(arr, r):
         if x in ratio_range: arr_dict[x] += 1
 
     # With the 1 special case removed, there now cannot be triplets if there are not 3 items in the dict
-    if len(arr_dict) < 3: return triplets
+    if len(arr_dict) < 3: return triplets, arr_dict, ratio_range
 
     for y in range(len(ratio_range)-2):
         firstkey = ratio_range[y]
@@ -133,7 +144,50 @@ def countTriplets(arr, r):
             triplet_count = (firstvalue) * (secondvalue) * (thirdvalue)
             triplets += triplet_count
 
-    return triplets
+    return triplets, arr_dict
+
+def countTriplets(arr, r):
+    """
+    This one isn't working either. Finally looked for a hint in the
+    discussions and it looks like sequentiality is important. Test case
+    to try is:
+
+    5 2
+    1 2 1 2 4
+    """
+    from collections import Counter
+    from math import factorial
+    arr_dict = {}
+    n0 = arr[0]
+    max_arr = max(arr)
+    ratio_range = {n0: 0}
+    triplets = 0
+
+    # Build all possible values
+    index = n0  
+    counter = 1
+    while index < max_arr:
+        index *= r
+        ratio_range[index] = counter
+        counter += 1
+    if index > max_arr: ratio_range.pop(index)
+    # Remove anything that isn't a possible value and build the dictionary
+    for x in range(len(arr)):
+        if arr[x] not in ratio_range: 
+            arr.pop(x)
+            continue
+        if arr[x] in arr_dict:
+            arr_dict[arr[x]] += [x]
+        else:
+            arr_dict[arr[x]] = [x]
+    if len(arr) < 3: return triplets # return 0 if there are not enough items left in arr to make a triplet
+
+    # Iterate backwards through arr starting at index arr[-2]
+    for n in range(len(arr)-2, -1, -1):
+        pass
+
+    print(arr, ratio_range, arr_dict)
+    return ''
 
 if __name__ == '__main__':
     """
@@ -150,11 +204,13 @@ if __name__ == '__main__':
      1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
     output: 161700
 
-    input06.txt output: 2 325 652 489
-                        3 948 101 982
+    input06.txt output:          2 325 652 489
+    input11.txt output:      1 667 018 988 625
+                  mine:        171 410 983 415
+    13_input03.txt output: 166 661 666 700 000    
     """
 
-    fptr = open('input06.txt')
+    fptr = open('custominput1.txt')
 
     nr = fptr.readline().rstrip().split()
 
