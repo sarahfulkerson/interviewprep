@@ -148,15 +148,12 @@ def countTriplets3(arr, r):
 
 def countTriplets(arr, r):
     """
-    This one isn't working either. Finally looked for a hint in the
-    discussions and it looks like sequentiality is important. Test case
-    to try is:
+    Test case to try is:
 
     5 2
     1 2 1 2 4
     """
     from collections import Counter
-    from math import factorial
     arr_dict = {}
     n0 = arr[0]
     max_arr = max(arr)
@@ -171,6 +168,7 @@ def countTriplets(arr, r):
         ratio_range[index] = counter
         counter += 1
     if index > max_arr: ratio_range.pop(index)
+
     # Remove anything that isn't a possible value and build the dictionary
     for x in range(len(arr)):
         if arr[x] not in ratio_range: 
@@ -184,10 +182,16 @@ def countTriplets(arr, r):
 
     # Iterate backwards through arr starting at index arr[-2]
     for n in range(len(arr)-2, -1, -1):
-        pass
+        item = arr[n]
+        item_before = item // r if item // r in ratio_range else 0  # Set to 0 if the next value in the progression does not appear in the input
+        item_after = item * r if item * r in ratio_range else 0     # Set to 0 if the previous value in the progression does not appear in the input
+        if not item_before or not item_after: continue                  # Continue in the loop if triplets are not possible with 'item' as 'j'
 
-    print(arr, ratio_range, arr_dict)
-    return ''
+        counter_after = Counter(arr[n+1:])
+        counter_before = Counter(arr[:n])
+        triplets += counter_before[item_before] * counter_after[item_after]
+
+    return triplets
 
 if __name__ == '__main__':
     """
