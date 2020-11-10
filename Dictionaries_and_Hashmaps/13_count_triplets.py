@@ -146,12 +146,11 @@ def countTriplets3(arr, r):
 
     return triplets, arr_dict
 
-def countTriplets(arr, r):
+def countTriplets4(arr, r):
     """
-    Test case to try is:
-
-    5 2
-    1 2 1 2 4
+    This one fails test case 3, 6, 10, and 11.
+    Wrong answer: 6
+    Timeout: 3, 10, 11
     """
     from collections import Counter
     arr_dict = {}
@@ -168,14 +167,14 @@ def countTriplets(arr, r):
         ratio_range[index] = counter
         counter += 1
     if index > max_arr: ratio_range.pop(index)
-
+    
     # Remove anything that isn't a possible value and build the dictionary
-    for x in range(len(arr)):
+    for x in range(len(arr)-1, -1, -1):
         if arr[x] not in ratio_range: 
             arr.pop(x)
             continue
         if arr[x] in arr_dict:
-            arr_dict[arr[x]] += [x]
+            arr_dict[arr[x]] = [x] + arr_dict[arr[x]]
         else:
             arr_dict[arr[x]] = [x]
     if len(arr) < 3: return triplets # return 0 if there are not enough items left in arr to make a triplet
@@ -186,15 +185,18 @@ def countTriplets(arr, r):
         item_before = item // r if item // r in ratio_range else 0  # Set to 0 if the next value in the progression does not appear in the input
         item_after = item * r if item * r in ratio_range else 0     # Set to 0 if the previous value in the progression does not appear in the input
         if not item_before or not item_after: continue                  # Continue in the loop if triplets are not possible with 'item' as 'j'
-
-        counter_after = Counter(arr[n+1:])
-        counter_before = Counter(arr[:n])
-        triplets += counter_before[item_before] * counter_after[item_after]
-
+        
+        counter_before = sum(1 for x in arr_dict[item_before] if x < n)
+        counter_after = sum(1 for x in arr_dict[item_after] if x > n)
+        triplets += counter_before * counter_after
     return triplets
 
 if __name__ == '__main__':
     """
+    6 2
+    3 6 3 6 12 18
+    output: 3
+    
     3
     1 3 9 9 27 81
     output: 6
@@ -214,7 +216,7 @@ if __name__ == '__main__':
     13_input03.txt output: 166 661 666 700 000    
     """
 
-    fptr = open('custominput1.txt')
+    fptr = open('input11.txt')
 
     nr = fptr.readline().rstrip().split()
 
@@ -229,6 +231,6 @@ if __name__ == '__main__':
     arr = list(map(int, fptr.readline().rstrip().split()))
     #arr = list(map(int, line.rstrip().split()))
     
-    ans = countTriplets(arr, r)
+    ans = countTriplets4(arr, r)
 
     print(ans)
