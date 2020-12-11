@@ -191,6 +191,73 @@ def countTriplets4(arr, r):
         triplets += counter_before * counter_after
     return triplets
 
+def countTripletsX(arr,r):
+    count = 0
+    dictItem = {}
+    dictPairs = {}
+
+    for i in reversed(arr):
+        ir = i*r
+        #print('1. i: %s, ir: %s, count: %s, dictPairs: %s, dictItem: %s' % (i, ir, count, dictPairs, dictItem))
+        if ir in dictPairs:
+            count += dictPairs[ir]
+            #print('2. i: %s, ir: %s, count: %s, dictPairs: %s, dictItem: %s' % (i, ir, count, dictPairs, dictItem))
+        if ir in dictItem:
+            dictPairs[i] = dictPairs.get(i, 0) + dictItem[ir]
+            #print('3. i: %s, ir: %s, count: %s, dictPairs: %s, dictItem: %s' % (i, ir, count, dictPairs, dictItem))
+        dictItem[i] = dictItem.get(i, 0) + 1
+        #print('4. i: %s, ir: %s, count: %s, dictPairs: %s, dictItem: %s\n' % (i, ir, count, dictPairs, dictItem))
+
+    return count
+
+def countTriplets(arr, r):
+    """
+    ~~manndras answer~~
+    So the algorithm is: 
+    -- keep two dictionaries
+        1.  A dictionary to store the number of times each single value that is repeated in the array.
+        2.  A dictionary to store any pair of values that are i and (i * r) (using i as the key).
+    -- Walk the array backwards
+        1.  If the pair dictionary has a value for r times the one you're checking, then you add the
+            number of pairs to the overall count.
+        2.  Otherwise, add a new item to the pair dictionary if there's a value r times the one you're
+            checking in the single value dictionary.
+        3.  Otherwise, just add the value to the single value dictionary. 
+    """
+    from collections import Counter
+    triplets = 0
+    item_dict = Counter()
+    pairs_dict = Counter()
+
+    for item in reversed(arr):
+        item_r = item*r
+        
+        if item_r in pairs_dict: triplets += pairs_dict[item_r]
+        if item_r in item_dict: pairs_dict[item] += item_dict[item_r]
+        item_dict[item] += 1
+
+    return triplets
+
+def countTripletsB(arr, r):
+    """
+    ~~nikhilgoyal104a1 answer~~
+    """
+    from collections import Counter
+    triplets = 0
+    leftDict = Counter()
+    rightDict = Counter()
+
+    for x in arr:
+        rightDict[x] += 1
+    
+    for item in arr:
+        rightDict[item] -= 1
+        leftDict[item] += 1
+        rightCt = rightDict.get(item*r, 0)
+        leftCt = leftDict.get(item/r, 0)
+        triplets += rightCt * leftCt
+
+    return triplets
 if __name__ == '__main__':
     """
     6 2
@@ -216,7 +283,7 @@ if __name__ == '__main__':
     13_input03.txt output: 166 661 666 700 000    
     """
 
-    fptr = open('input11.txt')
+    fptr = open('13_input11.txt')
 
     nr = fptr.readline().rstrip().split()
 
@@ -231,6 +298,7 @@ if __name__ == '__main__':
     arr = list(map(int, fptr.readline().rstrip().split()))
     #arr = list(map(int, line.rstrip().split()))
     
-    ans = countTriplets4(arr, r)
+    ans = countTripletsB(arr, r)
 
     print(ans)
+    print(1667018988625)
